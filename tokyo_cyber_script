@@ -1,0 +1,64 @@
+function createMonthlySpreadsheet() {
+
+  var folderId = "1xnXA-sVytv3YKL-x1Kghc8_dm3orPQNz";
+  var sourceSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  var dataSheet = sourceSpreadsheet.getSheetByName("TOKIO_CYBER_LAST_MONTH_VIEW");
+  var summarySheet = sourceSpreadsheet.getSheetByName("TOKIO_CYBER_SUMMARY");
+
+  // Create a new Spreadsheet monthly
+  var date = new Date();
+  var newSpreadsheetName = "Tokio Cyber - " + (date.getMonth() + 1) + "-" + date.getFullYear();
+  var newSpreadsheet = SpreadsheetApp.create(newSpreadsheetName);
+
+  var sheet = newSpreadsheet.getSheets()[0]; // Get the first sheet in the new spreadsheet
+
+  // Add Headers
+  var headers = [
+    "Tokio Marine HCC - Cyber & Professional Lines Group",
+    "Sample Reporting Template",
+    "Indigo Risk Retention Group, Inc"
+  ];
+
+  headers.forEach(function(header, index) {
+    sheet.getRange(index + 1, 1).setValue(header);
+  });
+
+  // Start copying data below the headers
+  var startRow = headers.length + 1; // Start after the headers
+
+  // Append data from TOKIO_CYBER_LAST_MONTH_VIEW
+  var dataRange = dataSheet.getDataRange();
+  var dataValues = dataRange.getValues();
+  sheet.getRange(startRow, 1, dataRange.getNumRows(), dataRange.getNumColumns()).setValues(dataValues);
+
+  // Calculate the starting column for the summary (under the last two columns of the data)
+  var lastColumn = dataRange.getLastColumn();
+  var summaryStartColumn = lastColumn - 1; // Adjust this if you need a different offset
+
+  // Leave a two-line gap
+  startRow += dataRange.getNumRows() + 2;
+
+  // Append data from TOKIO_CYBER_SUMMARY
+  var summaryRange = summarySheet.getDataRange();
+  var summaryValues = summaryRange.getValues();
+  sheet.getRange(startRow, summaryStartColumn, summaryRange.getNumRows(), summaryRange.getNumColumns()).setValues(summaryValues);
+
+  moveToFolder(newSpreadsheet.getId(), folderId);
+}
+
+function moveToFolder(spreadsheetId, folderId) {
+  // Get the file and the destination folder
+  var file = DriveApp.getFileById(spreadsheetId);
+  var folder = DriveApp.getFolderById(folderId);
+
+  // Move the file to the destination folder
+  file.moveTo(folder);
+}
+
+function createTimeDrivenTriggers() {
+  // Trigger every 1st of the month
+  ScriptApp.newTrigger('createMonthlySpreadsheet')
+           .timeBased()
+           .onMonthDay(1)
+           .create();
+}
