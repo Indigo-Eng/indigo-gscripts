@@ -7,7 +7,7 @@ function createMonthlySpreadsheet() {
   // for this to work, the AirByte automation for Tokio Marina has to be in place (it is, currently scheduled to run at 1 am on the first day of every month)
   var sheetNames = ["TOKIO_CYBER_LAST_MONTH_VIEW", "TOKIO_CYBER_SUMMARY"];
 
-  var newSpreadsheetName = "Tokio Cyber"
+  var newSpreadsheetName = "Tokio_Cyber_report"
   
   // Add Headers
   var headers = [
@@ -16,7 +16,7 @@ function createMonthlySpreadsheet() {
     "Indigo Risk Retention Group, Inc",
     ""
   ];
-  createMonthlySpreadsheetWithParams(folderId, sourceSpreadsheet, sheetNames, newSpreadsheetName, headers) 
+  createSpreadsheetWithParams(folderId, sourceSpreadsheet, sheetNames, newSpreadsheetName, headers) 
 }
 
 function createTimeDrivenTriggers() {

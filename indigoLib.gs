@@ -1,4 +1,4 @@
-function createMonthlySpreadsheetWithParams(folderId, sourceSpreadsheet, sheetNames, newSpreadsheetNameBase, headers, copyToSingleSheetFlag = true) {
+function createSpreadsheetWithParams(folderId, sourceSpreadsheet, sheetNames, newSpreadsheetNameBase, headers, copyToSingleSheetFlag = true, frequency = "m") {
   //var sourceSpreadsheet = SpreadsheetApp.openById(spreadsheetId);
 
   // Format the date to "year_month" pattern
