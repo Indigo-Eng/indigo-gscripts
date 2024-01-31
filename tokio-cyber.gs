@@ -16,7 +16,8 @@ function createMonthlySpreadsheet() {
     "Indigo Risk Retention Group, Inc",
     ""
   ];
-  createSpreadsheetWithParams(folderId, sourceSpreadsheet, sheetNames, newSpreadsheetName, headers) 
+  // this call works for combining in single sheet
+  createSpreadsheetWithParams(folderId, sourceSpreadsheet, sheetNames, newSpreadsheetName, headers, true); 
 }
 
 function createTimeDrivenTriggers() {

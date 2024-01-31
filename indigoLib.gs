@@ -1,31 +1,28 @@
-function createSpreadsheetWithParams(folderId, sourceSpreadsheet, sheetNames, newSpreadsheetNameBase, headers, copyToSingleSheetFlag = true, frequency = "m") {
-  //var sourceSpreadsheet = SpreadsheetApp.openById(spreadsheetId);
+function createSpreadsheetWithParams(folderId, sourceSpreadsheet, sheetNames, newSpreadsheetNameBase, 
+                                      headers, copyToSingleSheetFlag, frequency = "m") {  
 
   // Format the date to "year_month" pattern
   var postfix = getPrefix(frequency);  // defaults to monthly
 
   // Create a new Spreadsheet monthly
   var newSpreadsheetName = newSpreadsheetNameBase + "-" + postfix;
-  console.log("About to generate  spreadsheet named ", newSpreadsheetName);
 
   var newSpreadsheet = SpreadsheetApp.create(newSpreadsheetName);  
 
   // Loop through each sheet name provided in the parameter
   if (copyToSingleSheetFlag) {    
-    console.log("creating single-sheet spreadsheet");    
+    console.log("creating single-sheet spreadsheet " + newSpreadsheetName);    
+    var sheet = newSpreadsheet.getSheets()[0];
+    sheet.setName(postfix);
 
-  var sheet = newSpreadsheet.getSheets()[0];
-  sheet.setName(postfix);
-
-  if (headers != null && headers.length > 0){
-    headers.forEach(function(header, index) {
-      sheet.getRange(index + 1, 1).setValue(header);
-    });
-  }
-
+    if (headers != null && headers.length > 0){
+      headers.forEach(function(header, index) {
+        sheet.getRange(index + 1, 1).setValue(header);
+      });
+    }
     generateSingleSheetFromMany(sourceSpreadsheet, sheet, sheetNames, headers);
   } else {
-    console.log("creating spreadsheet with " + sourceSpreadsheet.getNumSheets() + " tabs");    
+    console.log("copying spreadsheet with " + sourceSpreadsheet.getNumSheets() + " tabs");    
     copySheetsToNewSpreadsheet(sourceSpreadsheet, newSpreadsheet, sheetNames);
   }
 
@@ -71,7 +68,7 @@ function generateSingleSheetFromMany(sourceSpreadsheet, workingSheet, sheetNames
 }
 
 
-function copySheetsToNewSpreadsheet(sourceSpreadsheet, newSpreadsheet, sheetNames) {
+function copySheetsToNewSpreadsheet(sourceSpreadsheet, newSpreadsheet, sheetNames) {  
   sheetNames.forEach(function(sheetName) {
     var sourceSheet = sourceSpreadsheet.getSheetByName(sheetName);
 
@@ -83,9 +80,25 @@ function copySheetsToNewSpreadsheet(sourceSpreadsheet, newSpreadsheet, sheetName
       var lastSheet = newSpreadsheet.getSheets()[newSpreadsheet.getNumSheets() - 1];
       lastSheet.setName(sheetName);
     }
-  });
+  });  
+  removeBlankSheets(newSpreadsheet);
 }
  
+function removeBlankSheets(spreadsheet) {
+  var sheets = spreadsheet.getSheets();
+  sheets.forEach(function(sheet) {
+    if (isSheetBlank(sheet)) {
+      spreadsheet.deleteSheet(sheet);
+    }
+  });
+}
+
+function isSheetBlank(sheet) {
+  // Check if the sheet is blank
+  var dataRange = sheet.getDataRange();
+  var values = dataRange.getValues();
+  return values.length === 0 || (values.length === 1 && values[0].every(function(cell) { return cell === ''; }));
+}
 
 function moveToFolder(spreadsheetId, folderId) {
   // Get the file and the destination folder
