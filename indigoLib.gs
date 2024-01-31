@@ -2,13 +2,20 @@ function createSpreadsheetWithParams(folderId, sourceSpreadsheet, sheetNames, ne
   //var sourceSpreadsheet = SpreadsheetApp.openById(spreadsheetId);
 
   // Format the date to "year_month" pattern
-  var namePrefix = getPrefix();  // defaults to monthly
+  var postfix = getPrefix(frequency);  // defaults to monthly
 
   // Create a new Spreadsheet monthly
-  var newSpreadsheetName = newSpreadsheetNameBase + "-" + namePrefix;
-  var newSpreadsheet = SpreadsheetApp.create(newSpreadsheetName);
+  var newSpreadsheetName = newSpreadsheetNameBase + "-" + postfix;
+  console.log("About to generate  spreadsheet named ", newSpreadsheetName);
+
+  var newSpreadsheet = SpreadsheetApp.create(newSpreadsheetName);  
+
+  // Loop through each sheet name provided in the parameter
+  if (copyToSingleSheetFlag) {    
+    console.log("creating single-sheet spreadsheet");    
+
   var sheet = newSpreadsheet.getSheets()[0];
-  sheet.setName(newSpreadsheetName);
+  sheet.setName(postfix);
 
   if (headers != null && headers.length > 0){
     headers.forEach(function(header, index) {
@@ -16,10 +23,9 @@ function createSpreadsheetWithParams(folderId, sourceSpreadsheet, sheetNames, ne
     });
   }
 
-  // Loop through each sheet name provided in the parameter
-  if (copyToSingleSheetFlag) {
     generateSingleSheetFromMany(sourceSpreadsheet, sheet, sheetNames, headers);
   } else {
+    console.log("creating spreadsheet with " + sourceSpreadsheet.getNumSheets() + " tabs");    
     copySheetsToNewSpreadsheet(sourceSpreadsheet, newSpreadsheet, sheetNames);
   }
 
@@ -44,19 +50,26 @@ function getPrefix(frequency = 'm'){
 
 // Loop through each sheet name provided in the parameter and combine into 1 sheet
 function generateSingleSheetFromMany(sourceSpreadsheet, workingSheet, sheetNames, headers){
-    sheetNames.forEach(function(sheetName) {
-      var dataSheet = sourceSpreadsheet.getSheetByName(sheetName);
-      var dataRange = dataSheet.getDataRange();
-      var dataValues = dataRange.getValues();
-      var startRow = 0;
-      if (headers != null && headers.length > 0) {
-        startRow = headers.length + 2; // Assuming headers take up the first 4 rows
-      }
-      workingSheet.getRange(startRow, 1, dataRange.getNumRows(), dataRange.getNumColumns()).setValues(dataValues);
-      startRow += dataRange.getNumRows() + 2; // Adjust for a two-line gap between data sets
-    }
-  );
+  var startRow = 0;
+  if (headers != null && headers.length > 0) {
+    startRow = headers.length + 2; // Assuming headers take up the first 4 rows
+  }
+
+  sheetNames.forEach(function(sheetName) {
+    var dataSheet = sourceSpreadsheet.getSheetByName(sheetName);
+    var dataRange = dataSheet.getDataRange();
+    var dataValues = dataRange.getValues();    
+    
+    // Get the total number of columns in workingSheet
+    var totalColumnsWorkingSheet = dataSheet.getMaxColumns();
+
+    // Calculate the starting column index to center the data
+    
+    workingSheet.getRange(startRow, 1, dataRange.getNumRows(), dataRange.getNumColumns()).setValues(dataValues);
+    startRow += dataRange.getNumRows() + 2; // Adjust for a two-line gap between data sets
+  });
 }
+
 
 function copySheetsToNewSpreadsheet(sourceSpreadsheet, newSpreadsheet, sheetNames) {
   sheetNames.forEach(function(sheetName) {
