@@ -2,16 +2,13 @@ function createMonthlySpreadsheetWithParams(folderId, sourceSpreadsheet, sheetNa
   //var sourceSpreadsheet = SpreadsheetApp.openById(spreadsheetId);
 
   // Format the date to "year_month" pattern
-  var date = new Date();
-  var year = date.getFullYear();
-  var month = date.getMonth() + 1; // Months are 0-indexed
-  var formattedDate = year + "_" + (month < 10 ? "0" : "") + month; // Ensures month is two digits
+  var namePrefix = getPrefix();  // defaults to monthly
 
   // Create a new Spreadsheet monthly
-  var newSpreadsheetName = newSpreadsheetNameBase + "-" + (date.getMonth() + 1) + "-" + date.getFullYear();
+  var newSpreadsheetName = newSpreadsheetNameBase + "-" + namePrefix;
   var newSpreadsheet = SpreadsheetApp.create(newSpreadsheetName);
   var sheet = newSpreadsheet.getSheets()[0];
-  sheet.setName(formattedDate);
+  sheet.setName(newSpreadsheetName);
 
   if (headers != null && headers.length > 0){
     headers.forEach(function(header, index) {
@@ -27,6 +24,22 @@ function createMonthlySpreadsheetWithParams(folderId, sourceSpreadsheet, sheetNa
   }
 
   moveToFolder(newSpreadsheet.getId(), folderId);
+}
+
+function getPrefix(frequency = 'm'){
+  var prefix = "";
+  var date = new Date();
+  var year = date.getFullYear();
+  var month = date.getMonth() + 1; // Months are 0-indexed
+  prefix = year + "_" + (month < 10 ? "0" + month : month) ; // Ensures month is two digits  
+
+  if (frequency == "w"){
+    prefix += "_" + Math.floor((day - 1) / 7); // get the week of the month
+  } else if (frequency == "d") {
+    prefix += "_" + date.getDate(); 
+  }
+
+  return prefix;
 }
 
 // Loop through each sheet name provided in the parameter and combine into 1 sheet
