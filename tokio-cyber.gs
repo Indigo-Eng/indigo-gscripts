@@ -16,7 +16,6 @@ function createMonthlySpreadsheet() {
     "Indigo Risk Retention Group, Inc",
     ""
   ];
-
   createMonthlySpreadsheetWithParams(folderId, sourceSpreadsheet, sheetNames, newSpreadsheetName, headers) 
 }
 
