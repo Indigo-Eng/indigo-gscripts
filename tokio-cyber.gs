@@ -22,10 +22,10 @@ function createMonthlySpreadsheet() {
 
 function createTimeDrivenTriggers() {
   // Trigger every 1st of the month
-  ScriptApp.newTrigger('createMonthlySpreadsheet')
-          .timeBased()
-         .onMonthDay(1)
-         .atHour(8) // Sets the hour at which the trigger should start considering execution
-         .nearMinute(0) // Sets the minute as close as possible to the beginning of the hour
-         .create();
-  }
+    ScriptApp.newTrigger('createMonthlySpreadsheet')
+    .timeBased()
+    .everyDays(1) // Sets the trigger to run every day
+    .atHour(17) // Sets the hour for the trigger (5 PM in 24-hour format)
+    .nearMinute(30) // Targets the trigger to run as close as possible to 5:30 PM
+    .create();
+}

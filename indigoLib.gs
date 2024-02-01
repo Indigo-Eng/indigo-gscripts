@@ -105,6 +105,16 @@ function moveToFolder(spreadsheetId, folderId) {
   var file = DriveApp.getFileById(spreadsheetId);
   var folder = DriveApp.getFolderById(folderId);
 
+  var fileName = file.getName();
+
+  // Search for files in the destination folder with the same name
+  var existingFiles = folder.getFilesByName(fileName);
+  while (existingFiles.hasNext()) {
+    var existingFile = existingFiles.next();
+    // Delete each file with the same name
+    existingFile.setTrashed(true);
+  }
+
   // Move the file to the destination folder
   file.moveTo(folder);
 }
