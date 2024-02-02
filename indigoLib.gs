@@ -119,3 +119,48 @@ function moveToFolder(spreadsheetId, folderId) {
   file.moveTo(folder);
 }
 
+function copyColumnsByNames(sourceSpreadsheet, targetSpreadsheet, sheetName, columnNames) {
+  var sourceSheet = sourceSpreadsheet.getSheetByName(sheetName);
+  var targetSheet = targetSpreadsheet.getSheetByName(sheetName) || 
+                    targetSpreadsheet.insertSheet(sheetName);
+
+  // Fetch all data from the source sheet
+  var data = sourceSheet.getDataRange().getValues();
+  var headers = data[0]; // Assuming the first row contains headers
+  
+  // If columnNames is empty, copy all columns in the original order
+  if (columnNames.length === 0) {
+    columnNames = headers;
+  }
+
+  // Map column names to indices
+  var colIndices = columnNames.map(function(name) {
+    return headers.indexOf(name);
+  }).filter(function(index) {
+    // Filter out columns that were not found
+    return index >= 0;
+  });
+  
+  // Filter and reorder the data based on the specified column names
+  var filteredData = data.map(function(row) {
+    return colIndices.map(function(index) {
+      return row[index];
+    });
+  });
+  
+  // Clear the target sheet and set the new values
+  targetSheet.clear();
+  targetSheet.getRange(1, 1, filteredData.length, columnNames.length).setValues(filteredData);
+}
+
+function copyMultipleSheetsColumns(folderId, sourceSpreadsheetId, targetSpreadsheetId, sheetsAndColumns) {
+  var sourceSpreadsheet = SpreadsheetApp.openById(sourceSpreadsheetId);
+  var targetSpreadsheet = SpreadsheetApp.openById(targetSpreadsheetId);
+
+  sheetsAndColumns.forEach(function(sheetInfo) {
+    copyColumnsByNames(sourceSpreadsheet, targetSpreadsheet, sheetInfo.sheetName, sheetInfo.columnNames);
+  });
+
+  moveToFolder(folderId, targetSpreadsheet);
+}
+
