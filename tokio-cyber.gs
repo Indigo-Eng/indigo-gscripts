@@ -5,9 +5,10 @@ function createMonthlySpreadsheet() {
   var sourceSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   // sheets to be generated
   // for this to work, the AirByte automation for Tokio Marina has to be in place (it is, currently scheduled to run at 1 am on the first day of every month)
-  var sheetNames = ["TOKIO_CYBER_LAST_MONTH_VIEW", "TOKIO_CYBER_SUMMARY"];
+  var sheetNames = ["TOKIO_CYBER_LAST_MONTH_VIEW", "TOKIO_CYBER_SUMMARY"];  
 
-  var newSpreadsheetName = "Tokio_Cyber_report"
+  var newSpreadsheetName = "Tokio_Cyber_report_Test"
+  var destinationSpreadsheet =  SpreadsheetApp.create(newSpreadsheetName);
   
   // Add Headers
   var headers = [
@@ -17,7 +18,13 @@ function createMonthlySpreadsheet() {
     ""
   ];
   // this call works for combining in single sheet
-  createSpreadsheetWithParams(folderId, sourceSpreadsheet, sheetNames, newSpreadsheetName, headers, true); 
+  //createSpreadsheetWithParams(folderId, sourceSpreadsheet, sheetNames, newSpreadsheetName, headers, true); 
+    var sheetsAndColumns = [
+    {sheetName: 'TOKIO_CYBER_LAST_MONTH_VIEW', columnNames: []},
+    {sheetName: 'TOKIO_CYBER_SUMMARY', columnNames: []} // Empty array implies all columns should be copied
+  ];
+
+  copyMultipleSheetsColumns(folderId, sourceSpreadsheet.getId(), destinationSpreadsheet.getId(), sheetsAndColumns);
 }
 
 function createTimeDrivenTriggers() {  

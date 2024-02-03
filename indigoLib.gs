@@ -161,6 +161,6 @@ function copyMultipleSheetsColumns(folderId, sourceSpreadsheetId, targetSpreadsh
     copyColumnsByNames(sourceSpreadsheet, targetSpreadsheet, sheetInfo.sheetName, sheetInfo.columnNames);
   });
 
-  moveToFolder(folderId, targetSpreadsheet);
+  moveToFolder(targetSpreadsheetId, folderId);
 }
 
